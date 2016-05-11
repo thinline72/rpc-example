@@ -17,4 +17,4 @@ of [HttpInvokerServiceExporter](https://github.com/thinline72/rpc-example/blob/m
 
 This module has custom [Http2InvokerRequestExecutor](https://github.com/thinline72/rpc-example/blob/master/client/src/main/java/com/ish/client/Http2InvokerRequestExecutor.java) implementation of AbstractHttpInvokerRequestExecutor with Jetty HTTP/2 Client. 
 As it uses prior knowledge about HTTP/2 on server-side you could try it without ALPN. Also it shows how to combine 
-Spring DI container with Guice through [SpringModule](https://github.com/thinline72/rpc-example/blob/master/client/src/main/java/com/ish/client/SpringModule.java)
+Spring DI container with Guice through [SpringModule](https://github.com/thinline72/rpc-example/blob/master/client/src/main/java/com/ish/client/SpringModule.java).
