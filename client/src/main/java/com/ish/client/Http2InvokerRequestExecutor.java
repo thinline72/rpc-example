@@ -25,10 +25,7 @@ import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.client.util.BytesContentProvider;
 import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.http2.client.HTTP2Client;
-import org.eclipse.jetty.http2.client.HTTP2ClientConnectionFactory;
 import org.eclipse.jetty.http2.client.http.HttpClientTransportOverHTTP2;
-import org.eclipse.jetty.io.Connection;
-import org.eclipse.jetty.io.EndPoint;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.remoting.httpinvoker.AbstractHttpInvokerRequestExecutor;
@@ -37,12 +34,7 @@ import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
 
 import javax.annotation.PreDestroy;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Map;
+import java.io.*;
 
 /**
  * This implementation of {@link AbstractHttpInvokerRequestExecutor} uses Jetty HTTP2 Client (high-level API) and
@@ -59,7 +51,10 @@ public class Http2InvokerRequestExecutor extends AbstractHttpInvokerRequestExecu
     protected int readTimeout = -1;
 
     public Http2InvokerRequestExecutor() throws Exception {
-        httpClient = new HttpClient(getClientTransport(), new SslContextFactory());
+        HttpClientTransportOverHTTP2 transport = new HttpClientTransportOverHTTP2(new HTTP2Client());
+        transport.setUseALPN(false);
+
+        httpClient = new HttpClient(transport, new SslContextFactory());
         httpClient.start();
     }
 
@@ -98,15 +93,6 @@ public class Http2InvokerRequestExecutor extends AbstractHttpInvokerRequestExecu
     @Override
     protected void writeRemoteInvocation(RemoteInvocation invocation, OutputStream os) throws IOException {
         serializationService.serialize(invocation, os);
-    }
-
-    protected HttpClientTransportOverHTTP2 getClientTransport() {
-        return new HttpClientTransportOverHTTP2(new HTTP2Client()) {
-            @Override
-            public Connection newConnection(EndPoint endPoint, Map<String, Object> context) throws IOException {
-                return new HTTP2ClientConnectionFactory().newConnection(endPoint, context);
-            }
-        };
     }
 
     public int getConnectTimeout() {
